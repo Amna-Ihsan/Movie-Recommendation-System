@@ -1,11 +1,24 @@
-import streamlit as st
+import os
+import requests
 import pickle
+import streamlit as st
 
 
+# Download movie_data.pkl from Hugging Face if it doesn't exist locally
+FILE_URL = "https://huggingface.co/datasets/Amna30/movie-recommender-data/resolve/main/movie_data.pkl"
+FILE_NAME = "movie_data.pkl"
 
-# load movie data and similarity mstrix
-with open("movie_data.pkl","rb") as file:
-    df,similarity = pickle.load(file)
+if not os.path.exists(FILE_NAME):
+    with st.spinner("Loading movie recommender..."):
+        response = requests.get(FILE_URL)
+        response.raise_for_status()
+
+        with open(FILE_NAME, "wb") as file:
+            file.write(response.content)
+
+# Load movie data and similarity matrix
+with open(FILE_NAME, "rb") as file:
+    df, similarity = pickle.load(file)
 
 
 def recommend(movie_name):
